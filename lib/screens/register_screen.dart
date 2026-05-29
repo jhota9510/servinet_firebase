@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../data/category_register_data.dart';
 import '../providers/auth_user_provider.dart';
 import 'login_screen.dart';
 
@@ -15,17 +16,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
-
   final _emailController = TextEditingController();
-
   final _phoneController = TextEditingController();
-
   final _passwordController = TextEditingController();
-
   final _direccionController = TextEditingController();
-
   final _experienceController = TextEditingController();
-
   final _biographyController = TextEditingController();
 
   bool obscure = true;
@@ -36,22 +31,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final Color primaryColor = const Color(0xFF4FC3F7);
 
-  final List<Map<String, String>> categoriesregister = [];
-
   @override
   void dispose() {
     _nameController.dispose();
-
     _emailController.dispose();
-
     _phoneController.dispose();
-
     _passwordController.dispose();
-
     _direccionController.dispose();
-
     _experienceController.dispose();
-
     _biographyController.dispose();
 
     super.dispose();
@@ -64,20 +51,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return InputDecoration(
       labelText: label,
 
-      prefixIcon: Icon(icon, color: primaryColor),
+      prefixIcon: Icon(
+        icon,
+        color: primaryColor,
+      ),
 
       filled: true,
       fillColor: Colors.white,
 
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-
         borderSide: BorderSide.none,
       ),
 
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-
         borderSide: BorderSide(
           color: primaryColor.withOpacity(0.2),
         ),
@@ -85,7 +73,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-
         borderSide: BorderSide(
           color: primaryColor,
           width: 2,
@@ -124,7 +111,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     boxShadow: [
                       BoxShadow(
                         color: primaryColor.withOpacity(0.4),
-
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       ),
@@ -190,7 +176,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // EMAIL
                 TextFormField(
                   controller: _emailController,
-
                   keyboardType: TextInputType.emailAddress,
 
                   decoration: customInput(
@@ -219,7 +204,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // TELÉFONO
                 TextFormField(
                   controller: _phoneController,
-
                   keyboardType: TextInputType.phone,
 
                   decoration: customInput(
@@ -269,7 +253,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // PASSWORD
                 TextFormField(
                   controller: _passwordController,
-
                   obscureText: obscure,
 
                   decoration: customInput(
@@ -281,7 +264,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         obscure
                             ? Icons.visibility
                             : Icons.visibility_off,
-
                         color: primaryColor,
                       ),
 
@@ -332,6 +314,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onChanged: (value) {
                     setState(() {
                       role = value!;
+                      selectedCategory = null;
                     });
                   },
                 ),
@@ -348,11 +331,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       icon: Icons.category,
                     ),
 
-                    items: categoriesregister.map((category) {
-                      return DropdownMenuItem(
+                    items: categoryRegisterData.map((category) {
+                      return DropdownMenuItem<String>(
                         value: category['id'],
 
-                        child: Text(category['name']!),
+                        child: Text(
+                          category['name'] ?? '',
+                        ),
                       );
                     }).toList(),
 
@@ -408,7 +393,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 if (role == 'provider')
                   TextFormField(
                     controller: _biographyController,
-
                     maxLines: 4,
 
                     decoration: customInput(
@@ -455,7 +439,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
-
                       foregroundColor: Colors.white,
 
                       shape: RoundedRectangleBorder(
@@ -474,7 +457,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               return;
                             }
 
-                            var signUp = auth.signUp(
+                            final success =
+                                await auth.signUp(
                               fullName:
                                   _nameController.text.trim(),
 
@@ -504,8 +488,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   _biographyController.text
                                       .trim(),
                             );
-
-                            final success = await signUp;
 
                             if (success &&
                                 context.mounted) {

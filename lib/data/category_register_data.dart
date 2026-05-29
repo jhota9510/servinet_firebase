@@ -1,4 +1,4 @@
- final List<Map<String, String>> categoriesregister = [
+ final List<Map<String, String>> categoryRegisterData = [
 
     // HOGAR
 
