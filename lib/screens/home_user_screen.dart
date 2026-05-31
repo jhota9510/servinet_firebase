@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:servinet/data/category_homeuser_data.dart';
+import 'package:servinet/data_and_utils/category_homeuser_data.dart';
+import 'package:servinet/screens/my_reservations_screen.dart';
+import 'package:servinet/screens/providers_screen.dart';
 import '../providers/auth_user_provider.dart';
-
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
@@ -32,15 +33,21 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
         title: const Text(
           "SERVINET",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
 
         centerTitle: true,
 
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const MyReservationsScreen()),
+              );
+            },
+            icon: const Icon(Icons.calendar_month, color: Colors.white),
+          ),
           // NOTIFICACIONES
           IconButton(
             onPressed: () {},
@@ -60,9 +67,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
                     title: const Text("Cerrar sesión"),
 
-                    content: const Text(
-                      "¿Deseas cerrar sesión?",
-                    ),
+                    content: const Text("¿Deseas cerrar sesión?"),
 
                     actions: [
                       TextButton(
@@ -140,10 +145,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   const Text(
                     "Profesionales cerca de ti",
 
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
 
                   const SizedBox(height: 25),
@@ -155,10 +157,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     decoration: InputDecoration(
                       hintText: "Buscar servicios...",
 
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: primaryColor,
-                      ),
+                      prefixIcon: Icon(Icons.search, color: primaryColor),
 
                       filled: true,
                       fillColor: Colors.white,
@@ -191,10 +190,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 child: Text(
                   "Categorías",
 
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -268,8 +264,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
 
                                 children: [
                                   Text(
@@ -321,10 +316,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 child: Text(
                   "Servicios disponibles",
 
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -338,16 +330,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   .snapshots(),
 
               builder: (context, snapshot) {
-                if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(
                     padding: EdgeInsets.all(30),
                     child: CircularProgressIndicator(),
                   );
                 }
 
-                if (!snapshot.hasData ||
-                    snapshot.data!.docs.isEmpty) {
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Padding(
                     padding: EdgeInsets.all(30),
                     child: Text("No hay servicios"),
@@ -355,9 +345,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 }
 
                 final services = snapshot.data!.docs.where((doc) {
-                  final title = doc['title']
-                      .toString()
-                      .toLowerCase();
+                  final title = doc['title'].toString().toLowerCase();
 
                   return title.contains(search);
                 }).toList();
@@ -365,8 +353,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 return ListView.builder(
                   shrinkWrap: true,
 
-                  physics:
-                      const NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
 
                   padding: const EdgeInsets.all(15),
 
@@ -384,29 +371,24 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
                           MaterialPageRoute(
                             builder: (_) => ProvidersScreen(
-                              categoryId:
-                                  service['categoryId'],
-                              categoryName:
-                                  service['title'],
+                              categoryId: service['categoryId'],
+                              categoryName: service['title'],
                             ),
                           ),
                         );
                       },
 
                       child: Container(
-                        margin:
-                            const EdgeInsets.only(bottom: 20),
+                        margin: const EdgeInsets.only(bottom: 20),
 
                         decoration: BoxDecoration(
                           color: Colors.white,
 
-                          borderRadius:
-                              BorderRadius.circular(25),
+                          borderRadius: BorderRadius.circular(25),
 
                           boxShadow: [
                             BoxShadow(
-                              color:
-                                  Colors.black.withOpacity(0.05),
+                              color: Colors.black.withOpacity(0.05),
 
                               blurRadius: 12,
 
@@ -416,8 +398,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         ),
 
                         child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
 
                           children: [
                             Container(
@@ -425,15 +406,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               width: double.infinity,
 
                               decoration: BoxDecoration(
-                                color: primaryColor
-                                    .withOpacity(0.15),
+                                color: primaryColor.withOpacity(0.15),
 
-                                borderRadius:
-                                    const BorderRadius.only(
-                                  topLeft:
-                                      Radius.circular(25),
-                                  topRight:
-                                      Radius.circular(25),
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(25),
+                                  topRight: Radius.circular(25),
                                 ),
                               ),
 
@@ -449,23 +426,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             ),
 
                             Padding(
-                              padding:
-                                  const EdgeInsets.all(18),
+                              padding: const EdgeInsets.all(18),
 
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
 
                                 children: [
                                   Text(
                                     service['title'],
 
-                                    style:
-                                        const TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 22,
 
-                                      fontWeight:
-                                          FontWeight.bold,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
 
@@ -475,44 +448,33 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                     service['description'],
 
                                     style: TextStyle(
-                                      color: Colors
-                                          .grey.shade700,
+                                      color: Colors.grey.shade700,
 
                                       fontSize: 15,
                                     ),
 
                                     maxLines: 2,
 
-                                    overflow:
-                                        TextOverflow
-                                            .ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
 
                                   const SizedBox(height: 18),
 
                                   Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment
-                                            .spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
 
                                     children: [
                                       Container(
-                                        padding:
-                                            const EdgeInsets
-                                                .symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                           horizontal: 15,
                                           vertical: 8,
                                         ),
 
-                                        decoration:
-                                            BoxDecoration(
-                                          color: Colors.green
-                                              .withOpacity(
-                                                  0.1),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.withOpacity(0.1),
 
-                                          borderRadius:
-                                              BorderRadius
-                                                  .circular(
+                                          borderRadius: BorderRadius.circular(
                                             15,
                                           ),
                                         ),
@@ -520,42 +482,29 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                         child: Text(
                                           "\$ ${service['price']}",
 
-                                          style:
-                                              const TextStyle(
-                                            color:
-                                                Colors.green,
+                                          style: const TextStyle(
+                                            color: Colors.green,
 
                                             fontSize: 18,
 
-                                            fontWeight:
-                                                FontWeight
-                                                    .bold,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
 
                                       ElevatedButton.icon(
-                                        style:
-                                            ElevatedButton
-                                                .styleFrom(
-                                          backgroundColor:
-                                              primaryColor,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: primaryColor,
 
-                                          foregroundColor:
-                                              Colors.white,
+                                          foregroundColor: Colors.white,
 
-                                          padding:
-                                              const EdgeInsets
-                                                  .symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                             horizontal: 18,
                                             vertical: 12,
                                           ),
 
-                                          shape:
-                                              RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius
-                                                    .circular(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
                                               15,
                                             ),
                                           ),
@@ -566,27 +515,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                             context,
 
                                             MaterialPageRoute(
-                                              builder: (_) =>
-                                                  ProvidersScreen(
+                                              builder: (_) => ProvidersScreen(
                                                 categoryId:
-                                                    service[
-                                                        'categoryId'],
+                                                    service['categoryId'],
 
-                                                categoryName:
-                                                    service[
-                                                        'title'],
+                                                categoryName: service['title'],
                                               ),
                                             ),
                                           );
                                         },
 
-                                        icon: const Icon(
-                                          Icons.visibility,
-                                        ),
+                                        icon: const Icon(Icons.visibility),
 
-                                        label: const Text(
-                                          "Ver proveedores",
-                                        ),
+                                        label: const Text("Ver proveedores"),
                                       ),
                                     ],
                                   ),
@@ -603,149 +544,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// PANTALLA PROVEEDORES
-
-class ProvidersScreen extends StatelessWidget {
-  final String categoryId;
-  final String categoryName;
-
-  const ProvidersScreen({
-    super.key,
-    required this.categoryId,
-    required this.categoryName,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final Color primaryColor = const Color(0xFF4FC3F7);
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF2FBFF),
-
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-
-        title: Text(
-          categoryName,
-
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .where('role', isEqualTo: 'provider')
-            .where('categoryId', isEqualTo: categoryId)
-            .snapshots(),
-
-        builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (!snapshot.hasData ||
-              snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text("No hay proveedores"),
-            );
-          }
-
-          final providers = snapshot.data!.docs;
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(15),
-
-            itemCount: providers.length,
-
-            itemBuilder: (context, index) {
-              final provider = providers[index];
-
-              return Container(
-                margin: const EdgeInsets.only(bottom: 15),
-
-                decoration: BoxDecoration(
-                  color: Colors.white,
-
-                  borderRadius: BorderRadius.circular(20),
-
-                  boxShadow: [
-                    BoxShadow(
-                      color:
-                          Colors.black.withOpacity(0.05),
-
-                      blurRadius: 10,
-
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-
-                child: ListTile(
-                  contentPadding:
-                      const EdgeInsets.all(15),
-
-                  leading: CircleAvatar(
-                    radius: 30,
-
-                    backgroundColor: primaryColor,
-
-                    child: const Icon(
-                      Icons.person,
-                      color: Colors.white,
-                    ),
-                  ),
-
-                  title: Text(
-                    provider['fullName'],
-
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  subtitle: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-
-                    children: [
-                      const SizedBox(height: 8),
-
-                      Text(
-                        provider['experience'] ?? '',
-                      ),
-
-                      const SizedBox(height: 5),
-
-                      Text(
-                        provider['biography'] ?? '',
-                      ),
-                    ],
-                  ),
-
-                  trailing: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                    ),
-
-                    onPressed: () {},
-
-                    child: const Text("Ver Perfil"),
-                  ),
-                ),
-              );
-            },
-          );
-        },
       ),
     );
   }

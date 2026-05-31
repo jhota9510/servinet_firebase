@@ -3,28 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:servinet/data_and_utils/create_service.dart';
 import 'package:servinet/providers/auth_user_provider.dart';
 import 'package:servinet/screens/home_proveedor_screen.dart';
 import 'package:servinet/screens/home_user_screen.dart';
 import 'firebase_options.dart';
 import 'screens/login_screen.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const TodoApp());
+
+  // Crear categorías en Firestore
+  await createServiceCollection();
+
+  runApp(const ServinetApp());
 }
 
-class TodoApp extends StatelessWidget {
-  const TodoApp({super.key});
+class ServinetApp extends StatelessWidget {
+  const ServinetApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => AuthUser(),
       child: MaterialApp(
-        title: 'TODO',
+        title: 'Servinet',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
@@ -41,24 +46,15 @@ class AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return StreamBuilder<User?>(
-      stream:
-          FirebaseAuth.instance
-              .authStateChanges(),
+      stream: FirebaseAuth.instance.authStateChanges(),
 
       builder: (context, snapshot) {
-
         // LOADING
 
-        if (snapshot.connectionState ==
-            ConnectionState.waiting) {
-
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(
-              child:
-                  CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
@@ -75,36 +71,32 @@ class AuthGate extends StatelessWidget {
         // CONSULTAR FIRESTORE
 
         return FutureBuilder<DocumentSnapshot>(
-          future:
-              FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(uid)
-                  .get(),
+          future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
 
           builder: (context, userSnapshot) {
-
             // LOADING
 
-            if (userSnapshot.connectionState ==
-                ConnectionState.waiting) {
-
+            if (userSnapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(
-                body: Center(
-                  child:
-                      CircularProgressIndicator(),
-                ),
+                body: Center(child: CircularProgressIndicator()),
               );
             }
 
             // SI NO EXISTE EL DOCUMENTO
-
-            if (!userSnapshot.hasData ||
-                !userSnapshot.data!.exists) {
+            if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+              Future.microtask(() async {
+                await FirebaseAuth.instance.signOut();
+              });
 
               return const Scaffold(
                 body: Center(
-                  child: Text(
-                    "Usuario no encontrado",
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text("Redirigiendo al inicio de sesión..."),
+                    ],
                   ),
                 ),
               );
@@ -112,9 +104,7 @@ class AuthGate extends StatelessWidget {
 
             // DATOS DEL USUARIO
 
-            final data =
-                userSnapshot.data!.data()
-                    as Map<String, dynamic>;
+            final data = userSnapshot.data!.data() as Map<String, dynamic>;
 
             // ROLE
 
@@ -128,14 +118,12 @@ class AuthGate extends StatelessWidget {
             // CLIENTE
 
             if (role == 'client') {
-
               return const UserHomeScreen();
             }
 
             // PROVEEDOR
 
             if (role == 'provider') {
-
               return const ContractorHomeScreen();
             }
 

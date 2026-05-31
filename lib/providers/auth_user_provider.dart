@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:servinet/data_and_utils/category_register_data.dart';
 
 class AuthUser extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -53,110 +54,142 @@ class AuthUser extends ChangeNotifier {
   }
 
   // REGISTRO
+  
   Future<bool> signUp({
-    required String fullName,
-    required String email,
-    required String password,
-    required String phone,
-    required String role,
+  required String fullName,
+  required String email,
+  required String password,
+  required String phone,
+  required String direccion,
+  required String role,
 
-    // SOLO PROVEEDOR
-    String? categoryId,
-    String? experience,
-    String? biography, required String direccion,
-  }) async {
-    _setLoading(true);
-    _error = null;
+  String? categoryId,
+  String? experience,
+  String? biography,
+}) async {
+  _setLoading(true);
+  _error = null;
 
-    try {
-      // VALIDACIONES
+  try {
+    // VALIDACIONES
 
-      if (fullName.trim().isEmpty) {
-        _error = "Ingrese el nombre";
+    if (fullName.trim().isEmpty) {
+      _error = "Ingrese el nombre";
+      return false;
+    }
+
+    if (!email.contains('@')) {
+      _error = "Correo inválido";
+      return false;
+    }
+
+    if (password.length < 6) {
+      _error = "La contraseña debe tener mínimo 6 caracteres";
+      return false;
+    }
+
+    if (phone.trim().isEmpty) {
+      _error = "Ingrese el teléfono";
+      return false;
+    }
+
+    if (role.isEmpty) {
+      _error = "Seleccione un rol";
+      return false;
+    }
+
+    // VALIDACIONES PROVEEDOR
+
+    if (role == 'provider') {
+      if (categoryId == null || categoryId.isEmpty) {
+        _error = "Seleccione una categoría";
         return false;
       }
 
-      if (!email.contains('@')) {
-        _error = "Correo inválido";
+      if (experience == null || experience.isEmpty) {
+        _error = "Ingrese la experiencia";
         return false;
       }
 
-      if (password.length < 6) {
-        _error = "La contraseña debe tener mínimo 6 caracteres";
+      if (biography == null || biography.isEmpty) {
+        _error = "Ingrese una biografía";
         return false;
       }
+    }
 
-      if (phone.trim().isEmpty) {
-        _error = "Ingrese el teléfono";
-        return false;
-      }
+    // CREAR USUARIO EN AUTH
 
-      if (role.isEmpty) {
-        _error = "Seleccione un rol";
-        return false;
-      }
+    final credential =
+        await _auth.createUserWithEmailAndPassword(
+      email: email.trim(),
+      password: password.trim(),
+    );
 
-      // VALIDACIONES PROVEEDOR
+    final uid = credential.user!.uid;
 
-      if (role == 'provider') {
-        if (categoryId == null || categoryId.isEmpty) {
-          _error = "Seleccione una categoría";
-          return false;
-        }
+    // GUARDAR USUARIO
 
-        if (experience == null || experience.isEmpty) {
-          _error = "Ingrese la experiencia";
-          return false;
-        }
-      }
+    await _db.collection('users').doc(uid).set({
+      'id': uid,
 
-      // CREAR USUARIO EN AUTH
+      'fullName': fullName.trim(),
+      'email': email.trim(),
+      'phone': phone.trim(),
+      'direccion': direccion.trim(),
 
-      final credential =
-          await _auth.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
+      'role': role,
+
+      'categoryId': categoryId,
+      'experience': experience,
+      'biography': biography ?? '',
+
+      'profileImage': '',
+      'verified': false,
+
+      'createdAt': Timestamp.now(),
+    });
+
+    // CREAR SERVICIO AUTOMÁTICAMENTE
+
+    if (role == 'provider') {
+      final category = categoryRegisterData.firstWhere(
+        (e) => e['id'] == categoryId,
       );
 
-      final uid = credential.user!.uid;
+      await _db.collection('services').add({
+        'providerId': uid,
 
-      // GUARDAR EN FIRESTORE
-
-      await _db.collection('users').doc(uid).set({
-        'id': uid,
-
-        // DATOS GENERALES
-        'fullName': fullName.trim(),
-        'email': email.trim(),
-        'phone': phone.trim(),
-
-        // ROL
-        'role': role,
-
-        // PROVEEDOR
         'categoryId': categoryId,
-        'experience': experience,
-        'biography': biography ?? '',
 
-        // PERFIL
-        'profileImage': '',
-        'verified': false,
+        'title': category['name'],
+        'description': biography ?? '',
 
-        // FECHAS
+        'price': 0,
+
+        'isActive': true,
+
+        'rating': 0.0,
+        'totalReviews': 0,
+        'totalBookings': 0,
+
+        'images': [],
+
         'createdAt': Timestamp.now(),
+        'updatedAt': Timestamp.now(),
       });
-
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _error = _handleAuthError(e);
-      return false;
-    } catch (e) {
-      _error = e.toString();
-      return false;
-    } finally {
-      _setLoading(false);
     }
+
+    return true;
+  } on FirebaseAuthException catch (e) {
+    _error = _handleAuthError(e);
+    return false;
+  } catch (e) {
+    _error = e.toString();
+    return false;
+  } finally {
+    _setLoading(false);
   }
+}
 
   // CERRAR SESIÓN
   Future<void> signOut() async {

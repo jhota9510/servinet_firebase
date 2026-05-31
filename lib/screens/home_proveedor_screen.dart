@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:servinet/screens/provider_requests_screen.dart';
 
 import '../providers/auth_user_provider.dart';
 
@@ -315,7 +316,14 @@ class _ContractorHomeScreenState extends State<ContractorHomeScreen> {
                     title: "Solicitudes",
                     icon: Icons.assignment,
                     color: Colors.green,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ProviderRequestsScreen(),
+                        ),
+                      );
+                    },
                   ),
 
                   _quickButton(

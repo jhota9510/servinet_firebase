@@ -12,8 +12,8 @@ class CategoryModel {
   factory CategoryModel.fromMap(Map<String, dynamic> map, String id) {
     return CategoryModel(
       id: id,
-      name: map['name'] ?? '',
-      icon: map['icon'] ?? '',
+      name: (map['name'] ?? '') as String,
+      icon: (map['icon'] ?? '')as String,
     );
   }
 

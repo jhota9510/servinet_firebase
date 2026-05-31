@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../data/category_register_data.dart';
+import '../data_and_utils/category_register_data.dart';
 import '../providers/auth_user_provider.dart';
 import 'login_screen.dart';
 
@@ -44,17 +44,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  InputDecoration customInput({
-    required String label,
-    required IconData icon,
-  }) {
+  InputDecoration customInput({required String label, required IconData icon}) {
     return InputDecoration(
       labelText: label,
 
-      prefixIcon: Icon(
-        icon,
-        color: primaryColor,
-      ),
+      prefixIcon: Icon(icon, color: primaryColor),
 
       filled: true,
       fillColor: Colors.white,
@@ -66,17 +60,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(
-          color: primaryColor.withOpacity(0.2),
-        ),
+        borderSide: BorderSide(color: primaryColor.withOpacity(0.2)),
       ),
 
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(
-          color: primaryColor,
-          width: 2,
-        ),
+        borderSide: BorderSide(color: primaryColor, width: 2),
       ),
     );
   }
@@ -141,10 +130,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const Text(
                   "Regístrate en SERVINET",
 
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
                 ),
 
                 const SizedBox(height: 35),
@@ -178,18 +164,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
 
-                  decoration: customInput(
-                    label: "Correo",
-                    icon: Icons.email,
-                  ),
+                  decoration: customInput(label: "Correo", icon: Icons.email),
 
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return "Ingrese el correo";
                     }
 
-                    final emailRegex =
-                        RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
 
                     if (!emailRegex.hasMatch(value.trim())) {
                       return "Correo inválido";
@@ -206,19 +188,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
 
-                  decoration: customInput(
-                    label: "Teléfono",
-                    icon: Icons.phone,
-                  ),
+                  decoration: customInput(label: "Teléfono", icon: Icons.phone),
 
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return "Ingrese el teléfono";
                     }
 
-                    if (value.trim().length < 7) {
-                      return "Número inválido";
+                    if (value.trim().length < 10) {
+                      return "Número inválido, Mínimo 10 Dígitos";
                     }
+                    if (int.tryParse(value) == null)
+                      return "Solo números permitidos";
 
                     return null;
                   },
@@ -255,25 +236,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _passwordController,
                   obscureText: obscure,
 
-                  decoration: customInput(
-                    label: "Contraseña",
-                    icon: Icons.lock,
-                  ).copyWith(
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        obscure
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                        color: primaryColor,
-                      ),
+                  decoration: customInput(label: "Contraseña", icon: Icons.lock)
+                      .copyWith(
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscure ? Icons.visibility : Icons.visibility_off,
+                            color: primaryColor,
+                          ),
 
-                      onPressed: () {
-                        setState(() {
-                          obscure = !obscure;
-                        });
-                      },
-                    ),
-                  ),
+                          onPressed: () {
+                            setState(() {
+                              obscure = !obscure;
+                            });
+                          },
+                        ),
+                      ),
 
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -294,16 +271,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 DropdownButtonFormField<String>(
                   value: role,
 
-                  decoration: customInput(
-                    label: "Rol",
-                    icon: Icons.badge,
-                  ),
+                  decoration: customInput(label: "Rol", icon: Icons.badge),
 
                   items: const [
-                    DropdownMenuItem(
-                      value: 'client',
-                      child: Text("Cliente"),
-                    ),
+                    DropdownMenuItem(value: 'client', child: Text("Cliente")),
 
                     DropdownMenuItem(
                       value: 'provider',
@@ -335,9 +306,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return DropdownMenuItem<String>(
                         value: category['id'],
 
-                        child: Text(
-                          category['name'] ?? '',
-                        ),
+                        child: Text(category['name'] ?? ''),
                       );
                     }).toList(),
 
@@ -348,8 +317,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
 
                     validator: (value) {
-                      if (role == 'provider' &&
-                          value == null) {
+                      if (role == 'provider' && value == null) {
                         return "Seleccione una categoría";
                       }
 
@@ -357,8 +325,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
 
-                if (role == 'provider')
-                  const SizedBox(height: 20),
+                if (role == 'provider') const SizedBox(height: 20),
 
                 // EXPERIENCIA
                 if (role == 'provider')
@@ -372,13 +339,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     validator: (value) {
                       if (role == 'provider' &&
-                          (value == null ||
-                              value.trim().isEmpty)) {
+                          (value == null || value.trim().isEmpty)) {
                         return "Ingrese experiencia";
                       }
 
-                      if (role == 'provider' &&
-                          value!.trim().length < 3) {
+                      if (role == 'provider' && value!.trim().length < 3) {
                         return "Experiencia muy corta";
                       }
 
@@ -386,8 +351,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
 
-                if (role == 'provider')
-                  const SizedBox(height: 20),
+                if (role == 'provider') const SizedBox(height: 20),
 
                 // BIOGRAFÍA
                 if (role == 'provider')
@@ -402,13 +366,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     validator: (value) {
                       if (role == 'provider' &&
-                          (value == null ||
-                              value.trim().isEmpty)) {
+                          (value == null || value.trim().isEmpty)) {
                         return "Ingrese una biografía";
                       }
 
-                      if (role == 'provider' &&
-                          value!.trim().length < 10) {
+                      if (role == 'provider' && value!.trim().length < 10) {
                         return "La biografía es muy corta";
                       }
 
@@ -442,8 +404,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       foregroundColor: Colors.white,
 
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(18),
                       ),
 
                       elevation: 8,
@@ -452,54 +413,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: auth.loading
                         ? null
                         : () async {
-                            if (!_formKey.currentState!
-                                .validate()) {
+                            if (!_formKey.currentState!.validate()) {
                               return;
                             }
 
-                            final success =
-                                await auth.signUp(
-                              fullName:
-                                  _nameController.text.trim(),
+                            final success = await auth.signUp(
+                              fullName: _nameController.text.trim(),
 
-                              email:
-                                  _emailController.text.trim(),
+                              email: _emailController.text.trim(),
 
-                              password:
-                                  _passwordController.text.trim(),
+                              password: _passwordController.text.trim(),
 
-                              phone:
-                                  _phoneController.text.trim(),
+                              phone: _phoneController.text.trim(),
 
-                              direccion:
-                                  _direccionController.text
-                                      .trim(),
+                              direccion: _direccionController.text.trim(),
 
                               role: role,
 
-                              categoryId:
-                                  selectedCategory,
+                              categoryId: selectedCategory,
 
-                              experience:
-                                  _experienceController.text
-                                      .trim(),
+                              experience: _experienceController.text.trim(),
 
-                              biography:
-                                  _biographyController.text
-                                      .trim(),
+                              biography: _biographyController.text.trim(),
                             );
 
-                            if (success &&
-                                context.mounted) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(
+                            if (success && context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  backgroundColor:
-                                      Colors.green,
+                                  backgroundColor: Colors.green,
 
-                                  content: Text(
-                                    "Registro exitoso",
-                                  ),
+                                  content: Text("Registro exitoso"),
                                 ),
                               );
 
@@ -508,16 +451,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
 
                     child: auth.loading
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
+                        ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
                             "Registrarse",
 
                             style: TextStyle(
                               fontSize: 20,
-                              fontWeight:
-                                  FontWeight.bold,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                   ),
@@ -532,14 +472,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: primaryColor,
-                        width: 2,
-                      ),
+                      side: BorderSide(color: primaryColor, width: 2),
 
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(18),
                       ),
                     ),
 
@@ -547,10 +483,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Navigator.pushReplacement(
                         context,
 
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              const LoginScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
                       );
                     },
 
@@ -560,8 +493,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: TextStyle(
                         color: primaryColor,
                         fontSize: 20,
-                        fontWeight:
-                            FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
